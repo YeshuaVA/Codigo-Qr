@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PinArt - Pines circulares personalizados</title>
+<style>
+  :root {
+    --rosa: #ff6b9d;
+    --morado: #8b5cf6;
+    --fondo: #fef7ff;
+    --texto: #1e1e2f;
+  }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', system-ui, sans-serif; }
+  body { background: var(--fondo); color: var(--texto); }
+  
+  header {
+    background: white; padding: 15px; position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  header h1 { color: var(--morado); font-size: 1.4rem; }
+  .cart-btn {
+    background: var(--rosa); color: white; border: none; padding: 10px 15px;
+    border-radius: 50px; font-weight: bold; cursor: pointer;
+  }
+  
+  .hero {
+    text-align: center; padding: 40px 20px;
+    background: linear-gradient(135deg, #ffe3f3 0%, #e0d4ff 100%);
+  }
+  .hero h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--texto); }
+  .hero p { color: #555; }
+  
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px; padding: 20px; max-width: 1000px; margin: 0 auto;
+  }
+  
+  .pin-card {
+    background: white; border-radius: 15px; overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: 0.2s;
+  }
+  .pin-card:hover { transform: translateY(-5px); }
+  .pin-img {
+    width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #f3f3f3;
+  }
+  .pin-info { padding: 12px; }
+  .pin-info h3 { font-size: 0.95rem; margin-bottom: 5px; }
+  .pin-info .precio { color: var(--morado); font-weight: bold; font-size: 1.1rem; }
+  .pin-info button {
+    width: 100%; margin-top: 8px; padding: 8px; border: none;
+    background: var(--rosa); color: white; border-radius: 8px;
+    font-weight: bold; cursor: pointer;
+  }
+  
+  /* Carrito lateral */
+  .cart {
+    position: fixed; right: -100%; top: 0; width: 85%; max-width: 350px;
+    height: 100%; background: white; box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+    transition: right 0.3s; z-index: 20; display: flex; flex-direction: column;
+  }
+  .cart.open { right: 0; }
+  .cart-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+  .cart-item {
+    display: flex; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eee;
+  }
+  .cart-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+  .cart-footer { padding: 15px; border-top: 1px solid #eee; }
+  .checkout-btn {
+    width: 100%; padding: 12px; background: #25D366; color: white; border: none;
+    border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer;
+  }
+  
+  .overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); display: none; z-index: 15;
+  }
+  .overlay.show { display: block; }
+  
+  footer { text-align: center; padding: 30px 20px; color: #888; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📌 PinArt</h1>
+  <button class="cart-btn" onclick="toggleCart()">🛒 <span id="cartCount">0</span></button>
+</header>
+
+<section class="hero">
+  <h2>Pines circulares únicos</h2>
+  <p>Diseños originales en 32mm. Envíos a todo México 🇲🇽</p>
+</section>
+
+<!-- AQUÍ VA TU CATÁLOGO. Solo duplica los .pin-card y cambia img, nombre y precio -->
+<div class="grid" id="catalogo">
+  
+  <div class="pin-card">
+    <img class="pin-img" src="https://i.imgur.com/8Km9tLL.jpg" alt="Pin Gato Aesthetic">
+    <div class="pin-info">
+      <h3>Gato Aesthetic</h3>
+      <div class="precio">$35 MXN</div>
+      <button onclick="addToCart('Gato Aesthetic', 35, 'https://i.imgur.com/8Km9tLL.jpg')">Agregar</button>
+    </div>
+  </div>
+  
+  <div class="pin-card">
+    <img class="pin-img" src="https://i.imgur.com/4M34hi2.jpg" alt="Pin Astronauta">
+    <div class="pin-info">
+      <h3>Astronauta Retro</h3>
+      <div class="precio">$35 MXN</div>
+      <button onclick="addToCart('Astronauta Retro', 35, 'https://i.imgur.com/4M34hi2.jpg')">Agregar</button>
+    </div>
+  </div>
+  
+  <div class="pin-card">
+    <img class="pin-img" src="https://media.istockphoto.com/id/938742222/es/foto/pizza-de-pepperoni-cheesy.jpg?s=612x612&w=0&k=20&c=GUwbHCrMdnpHGmTzHVPk2U9flWi3WgMVdfdOeBMU00E=.jpg" alt="Pin Pizza">
+    <div class="pin-info">
+      <h3>Pizza Lovers</h3>
+      <div class="precio">$30 MXN</div>
+      <button onclick="addToCart('Pizza Lovers', 30, 'https://media.istockphoto.com/id/938742222/es/foto/pizza-de-pepperoni-cheesy.jpg')">Agregar</button>
+    </div>
+  </div>
+  
+  <div class="pin-card">
+    <img class="pin-img" src="https://media.istockphoto.com/id/2160780626/es/vector/un-lindo-unicornio-un-poni-dibujado-a-mano-con-un-cuerno-dorado-aislado-sobre-un-fondo-blanco.jpg" alt="Pin Unicornio">
+    <div class="pin-info">
+      <h3>Unicornio Kawaii</h3>
+      <div class="precio">$40 MXN</div>
+      <button onclick="addToCart('Unicornio Kawaii', 40, 'https://i.imgur.com/3ZcTctb.jpg')">Agregar</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Carrito -->
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
+<div class="cart" id="cart">
+  <div class="cart-header">
+    <h3>Tu carrito</h3>
+    <button onclick="toggleCart()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">×</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <p style="color:#aaa; text-align:center; margin-top:50px;">Carrito vacío</p>
+  </div>
+  <div class="cart-footer">
+    <p style="margin-bottom:10px;"><b>Total: $<span id="cartTotal">0</span> MXN</b></p>
+    <button class="checkout-btn" onclick="enviarWhatsApp()">Pedir por WhatsApp</button>
+  </div>
+</div>
+
+<footer>
+  Hecho con ❤️ para emprendedores de pines. Tira de broche 32mm. 
+  <br>WhatsApp: 55-0000-0000
+</footer>
+
+<script>
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+function addToCart(nombre, precio, img) {
+  const item = carrito.find(p => p.nombre === nombre);
+  if(item) {
+    item.cantidad++;
+  } else {
+    carrito.push({nombre, precio, img, cantidad: 1});
+  }
+  guardarCarrito();
+  toggleCart();
+}
+
+function quitarItem(index) {
+  carrito.splice(index, 1);
+  guardarCarrito();
+}
+
+function guardarCarrito() {
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+  renderizarCarrito();
+}
+
+function renderizarCarrito() {
+  const cont = document.getElementById('cartItems');
+  const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+  const count = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+  
+  document.getElementById('cartTotal').textContent = total;
+  document.getElementById('cartCount').textContent = count;
+  
+  if(carrito.length === 0) {
+    cont.innerHTML = '<p style="color:#aaa; text-align:center; margin-top:50px;">Carrito vacío</p>';
+    return;
+  }
+  
+  cont.innerHTML = carrito.map((item, i) => `
+    <div class="cart-item">
+      <img src="${item.img}" alt="${item.nombre}">
+      <div style="flex:1">
+        <b>${item.nombre}</b><br>
+        $${item.precio} x ${item.cantidad}
+        <br><button onclick="quitarItem(${i})" style="background:none; border:none; color:red; font-size:0.8rem; cursor:pointer;">Quitar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCart() {
+  document.getElementById('cart').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+function enviarWhatsApp() {
+  if(carrito.length === 0) return alert('Agrega pines al carrito primero');
+  
+  let mensaje = '¡Hola! Quiero pedir estos pines:\n\n';
+  carrito.forEach(item => {
+    mensaje += `• ${item.nombre} x${item.cantidad} = $${item.precio * item.cantidad}\n`;
+  });
+  const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+  mensaje += `\nTotal: $${total} MXN\nNombre y dirección de envío:`;
+  
+  const url = `https://wa.me/525500000?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, '_blank');
+}
+
+renderizarCarrito();
+</script>
+</body>
+  </html>
